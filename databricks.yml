@@ -1,0 +1,78 @@
+# ============================================================
+# Databricks Asset Bundle Configuration
+# Equivalent of CloudFormation template for Databricks
+# ============================================================
+
+bundle:
+  name: sales-autoloader-pipeline
+
+workspace:
+  host: https://dbc-6cfad-58be.cloud.databricks.com
+
+resources:
+  jobs:
+    autoloader_pipeline:
+      name: AutoLoader_Bronze_Sales_Pipeline
+
+      tasks:
+        # Task 1: Setup infrastructure (schema + table)
+        - task_key: setup_infrastructure
+          notebook_task:
+            notebook_path: ./notebooks/setup/setup_catalog.py
+            base_parameters:
+              env: prod
+          job_cluster_key: main_cluster
+
+        # Task 2: Run Auto Loader
+        - task_key: run_autoloader
+          depends_on:
+            - task_key: setup_infrastructure
+          notebook_task:
+            notebook_path: ./notebooks/bronze/autoloader_bronze.py
+            base_parameters:
+              env: prod
+          job_cluster_key: main_cluster
+
+        # Task 3: Validate data quality
+        - task_key: validate_data
+          depends_on:
+            - task_key: run_autoloader
+          notebook_task:
+            notebook_path: ./notebooks/validation/validate_bronze.py
+            base_parameters:
+              env: prod
+          job_cluster_key: main_cluster
+
+      job_clusters:
+        - job_cluster_key: main_cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: i3.xlarge
+            num_workers: 1
+
+      # Schedule: Every day at 9:00 PM IST
+      schedule:
+        quartz_cron_expression: "0 0 21 * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: UNPAUSED
+
+      email_notifications:
+        on_failure:
+          - dineshthanneru123@gmail.com
+        on_success:
+          - dineshthanneru123@gmail.com
+
+      max_retries: 3
+      min_retry_interval_millis: 300000   # 5 minutes
+      timeout_seconds: 7200               # 2 hours
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      host: https://dbc-6cfad-58be.cloud.databricks.com
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-6cfad-58be.cloud.databricks.com
