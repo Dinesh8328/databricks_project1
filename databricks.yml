@@ -7,7 +7,7 @@ bundle:
   name: sales-autoloader-pipeline
 
 workspace:
-  host: https://dbc-6cfad-58be.cloud.databricks.com
+  host: https://dbc-dfb6cfad-58be.cloud.databricks.com
 
 resources:
   jobs:
@@ -70,9 +70,9 @@ targets:
   dev:
     mode: development
     workspace:
-      host: https://dbc-6cfad-58be.cloud.databricks.com
+      host: https://dbc-dfb6cfad-58be.cloud.databricks.com
 
   prod:
     mode: production
     workspace:
-      host: https://dbc-6cfad-58be.cloud.databricks.com
+      host: https://dbc-dfb6cfad-58be.cloud.databricks.com
