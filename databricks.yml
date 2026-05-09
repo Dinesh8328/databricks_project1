@@ -15,14 +15,6 @@ resources:
             notebook_path: ./notebooks/setup/setup_catalog.py
             base_parameters:
               env: prod
-          new_cluster:
-            spark_version: 15.4.x-scala2.12
-            node_type_id: i3.xlarge
-            num_workers: 0
-            spark_conf:
-              spark.databricks.cluster.profile: singleNode
-            custom_tags:
-              ResourceClass: SingleNode
 
         - task_key: run_autoloader
           depends_on:
@@ -31,14 +23,6 @@ resources:
             notebook_path: ./notebooks/bronze/autoloader_bronze.py
             base_parameters:
               env: prod
-          new_cluster:
-            spark_version: 15.4.x-scala2.12
-            node_type_id: i3.xlarge
-            num_workers: 0
-            spark_conf:
-              spark.databricks.cluster.profile: singleNode
-            custom_tags:
-              ResourceClass: SingleNode
 
         - task_key: validate_data
           depends_on:
@@ -47,14 +31,6 @@ resources:
             notebook_path: ./notebooks/validation/validate_bronze.py
             base_parameters:
               env: prod
-          new_cluster:
-            spark_version: 15.4.x-scala2.12
-            node_type_id: i3.xlarge
-            num_workers: 0
-            spark_conf:
-              spark.databricks.cluster.profile: singleNode
-            custom_tags:
-              ResourceClass: SingleNode
 
       schedule:
         quartz_cron_expression: "0 0 21 * * ?"
@@ -64,3 +40,21 @@ resources:
       email_notifications:
         on_failure:
           - dineshthanneru123@gmail.com
+        on_success:
+          - dineshthanneru123@gmail.com
+
+      timeout_seconds: 7200
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      host: https://dbc-dfb6cfad-58be.cloud.databricks.com
+      root_path: /Workspace/Users/dineshthanneru123@gmail.com/.bundle/${bundle.name}/${bundle.target}
+
+  default:
+    mode: production
+    default: true
+    workspace:
+      host: https://dbc-dfb6cfad-58be.cloud.databricks.com
+      root_path: /Workspace/Users/dineshthanneru123@gmail.com/.bundle/${bundle.name}/${bundle.target}
